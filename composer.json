@@ -1,0 +1,17 @@
+{
+  "name": "koba/digitaal-ondertekenen-php",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Wouter Henderickx",
+      "email": "wouter.henderickx@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Koba\\DigitaalOndertekenen\\": "src/DigitaalOndertekenen/"
+    }
+  },
+  "require": {}
+}
