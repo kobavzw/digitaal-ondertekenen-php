@@ -1,5 +1,6 @@
 {
   "name": "koba/digitaal-ondertekenen-php",
+  "description": "PHP wrapper for the Vlaamse overheid Digitaal Ondertekenen API.",
   "type": "library",
   "license": "MIT",
   "authors": [
@@ -13,5 +14,24 @@
       "Koba\\DigitaalOndertekenen\\": "src/DigitaalOndertekenen/"
     }
   },
-  "require": {}
+  "require": {
+    "php": "^8.1",
+    "php-http/discovery": "^1.19",
+    "psr/http-client-implementation": "^1.0",
+    "psr/http-factory-implementation": "^1.0",
+    "psr/http-client": "^1.0",
+    "psr/http-factory": "^1.1",
+    "psr/http-message": "^1.1",
+    "symfony/http-client": "*",
+    "nyholm/psr7": "*",
+    "league/oauth2-client": "^2.9"
+  },
+  "config": {
+    "allow-plugins": {
+      "php-http/discovery": true
+    }
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^2.2"
+  }
 }
