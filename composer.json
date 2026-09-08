@@ -22,9 +22,8 @@
     "psr/http-client": "^1.0",
     "psr/http-factory": "^1.1",
     "psr/http-message": "^1.1",
-    "symfony/http-client": "*",
-    "nyholm/psr7": "*",
-    "league/oauth2-client": "^2.9"
+    "league/oauth2-client": "^2.9",
+    "json-mapper/json-mapper": "^2.25"
   },
   "config": {
     "allow-plugins": {

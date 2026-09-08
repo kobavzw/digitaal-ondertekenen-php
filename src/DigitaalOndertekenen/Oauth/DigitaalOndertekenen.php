@@ -2,6 +2,7 @@
 
 namespace Koba\DigitaalOndertekenen\Oauth;
 
+use Koba\DigitaalOndertekenen\Environment;
 use Koba\DigitaalOndertekenen\Exception\OnlyClientCredentialsException;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
@@ -15,12 +16,7 @@ class DigitaalOndertekenen extends AbstractProvider
 {
     use BearerAuthorizationTrait;
 
-    public const ACCESS_TOKEN_URL = 'https://digitaal-ondertekenen-openapi.vlaanderen.be/authenticate/single-sign-on';
-
-    /**
-     * @var string
-     */
-    protected $accessTokenUrl = self::ACCESS_TOKEN_URL;
+    protected Environment $environment = Environment::PRODUCTION;
 
     /**
      * @param array<string, mixed> $options
@@ -56,7 +52,7 @@ class DigitaalOndertekenen extends AbstractProvider
      */
     public function getBaseAccessTokenUrl(array $params): string
     {
-        return $this->accessTokenUrl;
+        return $this->environment->getDigitaalOndertekenenAccessTokenUrl();
     }
 
     public function getResourceOwnerDetailsUrl(AccessToken $token): string

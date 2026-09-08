@@ -2,6 +2,7 @@
 
 namespace Koba\DigitaalOndertekenen\Oauth;
 
+use Koba\DigitaalOndertekenen\Environment;
 use Koba\DigitaalOndertekenen\Exception\OnlyClientCredentialsException;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Provider\AbstractProvider;
@@ -14,12 +15,7 @@ class Vlaanderen extends AbstractProvider
 {
     use BearerAuthorizationTrait;
 
-    public const ACCESS_TOKEN_URL = 'https://authenticatie.vlaanderen.be/op/v1/token';
-
-    /**
-     * @var string
-     */
-    protected $accessTokenUrl = self::ACCESS_TOKEN_URL;
+    protected Environment $environment = Environment::PRODUCTION;
 
     public function getBaseAuthorizationUrl(): string
     {
@@ -31,7 +27,7 @@ class Vlaanderen extends AbstractProvider
      */
     public function getBaseAccessTokenUrl(array $params): string
     {
-        return $this->accessTokenUrl;
+        return $this->environment->getVlaanderenAccessTokenUrl();
     }
 
     public function getResourceOwnerDetailsUrl(AccessToken $token): string
