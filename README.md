@@ -133,6 +133,26 @@ workflow. It is distinct from `signingOrder`, which controls the processing
 stage. Signature-field coordinates and dimensions are pixels; `x` is measured
 from the left and `y` from the top of the one-based page.
 
+## Download a signed document
+
+After the workflow has completed, download the signed document as raw bytes:
+
+```php
+$signedPdf = $client->downloadDocument(
+    packageId: $packageId,
+    documentId: $documentId,
+)->send();
+
+if (file_put_contents(__DIR__ . '/signed-agreement.pdf', $signedPdf) === false) {
+    throw new RuntimeException('Could not save the signed document');
+}
+```
+
+The endpoint returns the document's current bytes, so wait for workflow
+completion when the signed version is required. The optional `password`, `otp`,
+and `folderId` arguments map to SigningHub's `x-password`, `x-otp`, and
+`x-folder-id` access headers.
+
 ## Available operations
 
 Every client method returns a call object. Invoke `send()` to execute it.
@@ -141,6 +161,7 @@ Every client method returns a call object. Invoke `send()` to execute it.
 | --- | --- | --- |
 | `createPackage()` | `AddPackageResponse` | Create a draft package. |
 | `uploadDocument()` | `UploadDocumentResponse` | Upload raw document bytes to a package. |
+| `downloadDocument()` | `string` | Download a document's current raw bytes. |
 | `addWorkflowRecipient()` | `WorkflowRecipientResponse` | Add a recipient to the draft workflow. |
 | `addSignatureField()` | `AddSignatureFieldResponse` | Add a visible signature field to a document. |
 | `startWorkflow()` | `StartWorkflowResponse` | Share the package and start the workflow. |

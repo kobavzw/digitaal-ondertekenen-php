@@ -11,6 +11,7 @@ use Koba\DigitaalOndertekenen\Api\WorkflowMode;
 use Koba\DigitaalOndertekenen\Call\AddSignatureFieldCall;
 use Koba\DigitaalOndertekenen\Call\AddWorkflowRecipientCall;
 use Koba\DigitaalOndertekenen\Call\CreatePackageCall;
+use Koba\DigitaalOndertekenen\Call\DownloadDocumentCall;
 use Koba\DigitaalOndertekenen\Call\GenerateIntegrationUrlCall;
 use Koba\DigitaalOndertekenen\Call\StartWorkflowCall;
 use Koba\DigitaalOndertekenen\Call\UploadDocumentCall;
@@ -72,6 +73,36 @@ final class Client
             $contents,
             $convertDocument,
             $source,
+        );
+    }
+
+    /**
+     * Downloads the current bytes of a document in a package.
+     *
+     * Once the workflow is complete, these are the signed document bytes.
+     * Protected documents require the password and/or one-time password set by
+     * the document owner. A folder ID is only needed for a shared-space folder.
+     *
+     * @param int $packageId ID of the package containing the document.
+     * @param int $documentId ID of the document to download.
+     * @param string|null $password Password set for document access, if any.
+     * @param string|null $otp One-time password set for document access, if any.
+     * @param string|null $folderId Folder ID when the package is in a shared space.
+     */
+    public function downloadDocument(
+        int $packageId,
+        int $documentId,
+        ?string $password = null,
+        ?string $otp = null,
+        ?string $folderId = null,
+    ): DownloadDocumentCall {
+        return new DownloadDocumentCall(
+            $this->transport,
+            $packageId,
+            $documentId,
+            $password,
+            $otp,
+            $folderId,
         );
     }
 
