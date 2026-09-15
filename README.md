@@ -192,6 +192,90 @@ try {
 Argument validation errors, such as an invalid email address, page number, or
 field dimensions, throw `InvalidArgumentException` before the request is sent.
 
+## Webhooks
+
+SigningHub can publish document-processing reports to an integration webhook
+URL when configured document actions occur. These webhook requests use `POST`
+and contain XML. The webhook parser accepts either a PSR-7 server request or
+the raw request body:
+
+```php
+use Koba\DigitaalOndertekenen\Exception\InvalidWebhookException;
+use Koba\DigitaalOndertekenen\Webhook\WebhookActionType;
+use Koba\DigitaalOndertekenen\Webhook\WebhookParser;
+
+try {
+    $event = WebhookParser::parseXml(
+        file_get_contents('php://input') ?: '',
+    );
+
+    // Store this in a table with a unique constraint to make retries harmless.
+    $idempotencyKey = $event->getFingerprint();
+
+    $packageId = $event->getPackageId();
+    $action = $event->getAction();
+
+    switch ($action->type) {
+        case WebhookActionType::SIGNED:
+            // A participant signed. This does not necessarily mean that the
+            // package is complete when more workflow steps remain.
+            break;
+
+        case WebhookActionType::COMPLETED:
+            // The package reached its terminal completed state.
+            break;
+
+        case WebhookActionType::EVIDENCE_REPORT_GENERATED:
+            // SigningHub finished generating the evidence report.
+            break;
+    }
+
+    $documents = $event->getDocuments();
+    $workflowUsers = $event->getWorkflowUsers();
+
+    // Queue the work and acknowledge the request promptly.
+} catch (InvalidWebhookException $exception) {
+    http_response_code(400);
+    exit;
+}
+
+http_response_code(204);
+```
+
+When a framework provides a `ServerRequestInterface`, use
+`WebhookParser::parseRequest()` to validate the HTTP method as well. The typed
+accessors expose the package identity and status, the current action, the next
+signer, workflow state, documents, and workflow users. `getRawXml()` remains
+available for fields that the library does not model yet.
+
+A completed one-signer flow can produce three requests in quick succession:
+`SIGNED`, `COMPLETED`, and `EVIDENCE_REPORT_GENERATED`. Branch on
+`$event->getAction()->type`; the status values are snapshots and may lag during
+the earlier event. Unknown future action types produce a `null` enum value and
+remain available through `$event->getAction()->raw_type`. Deliveries can also
+be retried or arrive out of order, so make handlers idempotent and do not use
+arrival order as workflow state.
+
+`WebhookActionType` contains the documented `SHARED`, `SIGNED`, `REVIEWED`,
+`DECLINED`, `EDITED`, `CARBON_COPIED`, `RECALLED`, `REMINDED`, `COMPLETED`,
+`EVIDENCE_REPORT_GENERATED`, and `DOCUMENT_DELETED` actions.
+`WebhookProcessStatus` similarly models a workflow user's processing status.
+Unknown values remain accessible through `raw_type` and `raw_process_status`,
+respectively, so new SigningHub values do not cause parsing to fail.
+
+Parsing validates safe XML, the `DocumentProcessingInformation` root, and all
+modeled fields before returning an event. Optional document and workflow-user
+collections are represented by empty arrays when absent. Parsing does not
+establish who sent the request. Observed SigningHub deliveries do not include a
+credential or cryptographic signature header, so production applications must
+protect the endpoint at the network or gateway layer and confirm consequential
+state changes through the API. `getFingerprint()` provides a SHA-256 fallback
+idempotency key for the exact received body because the payload does not contain
+an event ID.
+
+Workflow completion reports and attached completed documents are separate
+outputs and are not parsed by `WebhookParser`.
+
 ## Token caching
 
 By default, each client keeps the Digitaal Ondertekenen access token in memory

@@ -15,6 +15,7 @@
     }
   },
   "require": {
+    "ext-dom": "*",
     "php": "^8.1",
     "php-http/discovery": "^1.20",
     "psr/http-client-implementation": "^1.0",
@@ -29,6 +30,13 @@
     "allow-plugins": {
       "php-http/discovery": true
     }
+  },
+  "scripts": {
+    "phpstan": "phpstan analyse --no-progress --debug",
+    "test": [
+      "@php tests/WebhookParserTest.php",
+      "@phpstan"
+    ]
   },
   "require-dev": {
     "phpstan/phpstan": "^2.2"
