@@ -143,6 +143,7 @@ final class WebhookParser
                 processed_on: $user->optionalString('processed_on'),
                 processed_as: $user->optionalString('processed_as'),
                 signing_order: $user->optionalInteger('signing_order'),
+                reason: $user->optionalString('reason'),
             ),
             $workflowUsers->elements('workflow_user'),
         );

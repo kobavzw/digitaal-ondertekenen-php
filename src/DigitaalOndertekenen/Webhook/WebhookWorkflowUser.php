@@ -17,6 +17,7 @@ final readonly class WebhookWorkflowUser
         public ?string $processed_on,
         public ?string $processed_as,
         public ?int $signing_order,
+        public ?string $reason = null,
     ) {
         $this->process_status = WebhookProcessStatus::tryFrom($raw_process_status);
     }
